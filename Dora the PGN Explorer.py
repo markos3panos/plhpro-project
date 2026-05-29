@@ -1,5 +1,28 @@
 import os
+import tkinter as tk
+from tkinter import font as tkfont
 import chess.pgn
+
+
+# Unicode symvola gia ta pionia tou skakiou
+PIECES_UNICODE = {
+    "K": "♔", "Q": "♕", "R": "♖",
+    "B": "♗", "N": "♘", "P": "♙",
+    "k": "♚", "q": "♛", "r": "♜",
+    "b": "♝", "n": "♞", "p": "♟",
+}
+
+# Arxiki diataxi - kefalaia=lefka, peza=mavra, telia=adeio tetragono
+ARXIKI_THESI = [
+    ["r", "n", "b", "q", "k", "b", "n", "r"],
+    ["p", "p", "p", "p", "p", "p", "p", "p"],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    ["P", "P", "P", "P", "P", "P", "P", "P"],
+    ["R", "N", "B", "Q", "K", "B", "N", "R"],
+]
 
 
 # Sinartisi pou vriskει ola ta arxeia .pgn mesa se enan fakelo
@@ -104,6 +127,102 @@ def emfanise_stoixeia_partidas(game):
         print(line)
 
 
+# Sinartisi pou sxediazei to tampla tou skakiou se tkinter parathiro
+# kai topothetei ta pionia stin arxiki tous thesi (Erotima iii)
+def sxediase_tampla(game):
+    headers = game.headers
+    aspros = headers.get("White", "?")
+    mavros = headers.get("Black", "?")
+
+    root = tk.Tk()
+    root.title(f"Skakiera - {aspros} vs {mavros}")
+    root.configure(bg="#312e2b")
+    root.resizable(False, False)
+
+    MEGETHOS = 64               # megethos kathenos tetragonou se pixel
+    PERITHORIO = 28             # peritorio gia tis etiketes a-h kai 1-8
+    DIASTASI = MEGETHOS * 8
+
+    XROMA_ANOIXTO = "#f0d9b5"   # anoixto tetragono
+    XROMA_SKOURO = "#b58863"    # skouro tetragono
+
+    canvas = tk.Canvas(
+        root,
+        width=DIASTASI + 2 * PERITHORIO,
+        height=DIASTASI + 2 * PERITHORIO,
+        bg="#312e2b",
+        highlightthickness=0,
+    )
+    canvas.pack(padx=10, pady=10)
+
+    # Sxediasi twn 64 tetragonon
+    for grammi in range(8):
+        for stili in range(8):
+            x1 = PERITHORIO + stili * MEGETHOS
+            y1 = PERITHORIO + grammi * MEGETHOS
+            x2 = x1 + MEGETHOS
+            y2 = y1 + MEGETHOS
+            xroma = XROMA_ANOIXTO if (grammi + stili) % 2 == 0 else XROMA_SKOURO
+            canvas.create_rectangle(x1, y1, x2, y2, fill=xroma, outline=xroma)
+
+    # Etiketes: arithmoi 1-8 aristera kai grammata a-h kato
+    etiketa_font = ("Arial", 11, "bold")
+    for i in range(8):
+        # arithmos grammis (8 panw, 1 kato)
+        canvas.create_text(
+            PERITHORIO / 2,
+            PERITHORIO + i * MEGETHOS + MEGETHOS / 2,
+            text=str(8 - i),
+            fill="#e8e6e3",
+            font=etiketa_font,
+        )
+        # gramma stilis (a aristera, h dexia)
+        canvas.create_text(
+            PERITHORIO + i * MEGETHOS + MEGETHOS / 2,
+            DIASTASI + PERITHORIO + PERITHORIO / 2,
+            text=chr(ord("a") + i),
+            fill="#e8e6e3",
+            font=etiketa_font,
+        )
+
+    # Epilogi katallilis grammatoseiras gia ta symvola tou skakiou
+    diathesimes = set(tkfont.families())
+    for ypopsifia in ("Segoe UI Symbol", "DejaVu Sans", "Arial Unicode MS", "Arial"):
+        if ypopsifia in diathesimes:
+            piece_font = (ypopsifia, 40)
+            break
+    else:
+        piece_font = ("Arial", 40)
+
+    # Topothetisi pionion stin arxiki tous thesi
+    for grammi in range(8):
+        for stili in range(8):
+            pioni = ARXIKI_THESI[grammi][stili]
+            if pioni == ".":
+                continue
+            x = PERITHORIO + stili * MEGETHOS + MEGETHOS / 2
+            y = PERITHORIO + grammi * MEGETHOS + MEGETHOS / 2
+            symvolo = PIECES_UNICODE[pioni]
+            # Skia gia kalitero contrast kai meta to kyrio symvolo
+            skia_xroma = "#000000" if pioni.isupper() else "#3a3a3a"
+            kyrio_xroma = "#ffffff" if pioni.isupper() else "#1a1a1a"
+            canvas.create_text(x + 1, y + 1, text=symvolo, font=piece_font, fill=skia_xroma)
+            canvas.create_text(x, y, text=symvolo, font=piece_font, fill=kyrio_xroma)
+
+    # Pliroforiaki etiketa stin koryfi me tous paiktes
+    info = tk.Label(
+        root,
+        text=f"{aspros}  (lefka)   vs   {mavros}  (mavra)",
+        bg="#312e2b",
+        fg="#e8e6e3",
+        font=("Arial", 11, "bold"),
+        pady=6,
+    )
+    info.pack(side="bottom")
+
+    root.mainloop()
+
+
 def main():
     # O xristis dinei to path tou fakelou
     folder_path = input("Dwse to path tou fakelou me ta arxeia PGN: ").strip()
@@ -131,8 +250,11 @@ def main():
                 print("To arxeio den periexei egkiri partida.")
                 return
 
-            # Emfanisi stoixeiwn
+            # Emfanisi stoixeiwn (Erotima ii)
             emfanise_stoixeia_partidas(game)
+
+            # Anoigma grafikis skakieras me ta pionia stin arxiki thesi (Erotima iii)
+            sxediase_tampla(game)
 
     except Exception as e:
         print("Parousiastike sfalma kata tin anagnwsi tou arxeiou.")
