@@ -98,8 +98,7 @@ def sxediase_tampla(headers):
         text=f"{aspros}  (lefka)   vs   {mavros}  (mavra)",
         bg="#312e2b",
         fg="#e8e6e3",
-        font=("Arial", 11, "bold"),
-        pady=6,
+        font=("Arial", 11, "bold")
     )
     info.pack(side="bottom")
 
@@ -108,8 +107,29 @@ def sxediase_tampla(headers):
     root.mainloop()
 
 def draw_controls(root):
-    button = tk.Button(root, text="Click me", command=on_click)
-    button.pack(pady=20)
+    button_frame = tk.Frame(root, bg="#312e2b")
+    button_frame.pack(pady=(5, 15))
 
-def on_click():
+    previous_move_button = tk.Button(
+        button_frame,
+        text="Previous move",
+        command=previous_move,
+        width=12,
+        height=1
+    )
+    previous_move_button.pack(side="left", padx=5)
+
+    next_move_button = tk.Button(
+        button_frame,
+        text="Next move",
+        command=next_move,
+        width=12,
+        height=1
+    )
+    next_move_button.pack(side="left", padx=5)
+
+def next_move():
+    print("Button clicked")
+
+def previous_move():
     print("Button clicked")
