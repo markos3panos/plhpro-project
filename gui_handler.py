@@ -103,4 +103,13 @@ def sxediase_tampla(headers):
     )
     info.pack(side="bottom")
 
+    draw_controls(root)
+
     root.mainloop()
+
+def draw_controls(root):
+    button = tk.Button(root, text="Click me", command=on_click)
+    button.pack(pady=20)
+
+def on_click():
+    print("Button clicked")
