@@ -15,7 +15,7 @@ def main():
 
         pgn_handler.emfanise_stoixeia_partidas(headers, imikiniseis)
 
-        gui_handler.sxediase_tampla(headers)
+        gui_handler.sxediase_tampla(headers, imikiniseis)
 
     except Exception as e:
         print("Parousiastike sfalma kata tin anagnwsi tou arxeiou.")
