@@ -1,0 +1,39 @@
+import os
+
+def epilexe_pgn(folder):
+    #Λίστα με όλα τα αρχεία pgn
+    pgn_files = []
+
+    for file in os.listdir(folder):
+        if file.lower().endswith('.pgn'):
+            pgn_files.append(file)
+
+    #Ελεγχος αν βρεθηκαν αρχεια
+    if len(pgn_files) == 0:
+        print("Δεν βρέθηκαν αρχεία PGN")
+        return None
+
+    #εμγανιση λιστας αρχειων
+    print("\nδιαθέσιμα αρχεία PGN:\n")
+
+    for i, file in enumerate(pgn_files, start=1):
+        print(f"{i}. {file}")
+
+#επιλογή αρχείου
+    while True:
+        try:
+            choice = int(input("\nεπίλεξε αρχείο: "))
+            if choice < 0 or choice > len(pgn_files):
+                selected_file = pgn_files[choice - 1]
+                print("\nεπιλέχθηκε:")
+                print(selected_file)
+                return selected_file
+
+            print("μη έγκυρη επιλογή")
+        except ValueError:
+            print("δώστε αριθμό")
+
+#κυριο προγραμμα
+folder = input("δώστε φάκελο: ")
+
+epilexe_pgn(folder)
